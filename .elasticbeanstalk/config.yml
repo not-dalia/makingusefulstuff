@@ -1,6 +1,8 @@
 branch-defaults:
   default:
     environment: Makingusefulstuff-env
+  master:
+    environment: node-express-env
 environment-defaults:
   Makingusefulstuff-env:
     branch: null
