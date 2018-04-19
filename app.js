@@ -11,7 +11,7 @@ var usernameRouter = require('./routes/username');
 var app = express();
 
 // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.set('port', process.env.PORT || 8080);
 
