@@ -20,7 +20,7 @@ var connection = mysql.createConnection({
     password: process.env.AWS_DB_PASS,
     database: process.env.AWS_DB_NAME,
     ssl: {
-        ca: fs.readFileSync(__dirname + '/config/mysql-ca.crt')
+        ca: fs.readFileSync(__dirname + '/config/rds-combined-ca-bundle.pem')
     }
 });
 
