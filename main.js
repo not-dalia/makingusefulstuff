@@ -18,7 +18,8 @@ var connection = mysql.createConnection({
     host: process.env.AWS_DB_HOST,
     user: process.env.AWS_DB_USER,
     password: process.env.AWS_DB_PASS,
-    database: process.env.AWS_DB_NAME
+    database: process.env.AWS_DB_NAME,
+    ssl: "Amazon RDS"
 });
 
 
