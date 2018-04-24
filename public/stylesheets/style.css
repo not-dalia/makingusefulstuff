@@ -15,3 +15,23 @@ a {
   height: auto;
 
 }
+
+#submit-comment{
+  display:inline-block;
+  position:relative;
+}
+
+#submit-comment button{
+  position:absolute;
+  bottom:10px;
+  right:10px;
+}
+
+#submit-comment textarea{
+  display:block;
+  resize: none;
+}
+
+.comment .comment-text{
+  white-space: pre-wrap;
+}

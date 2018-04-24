@@ -8,6 +8,8 @@ var multer = require('multer')
 var multerS3 = require('multer-s3')
 var mysql = require('mysql');
 const fs = require('fs');
+var geoip = require('geoip-country');
+const bodyParser = require('body-parser');
 
 const NOUNS = ["3DPrinter", "Maker", "Inventor", "Creator", "Scientist", "Engineer", "Designer", "Programmer", "Robot", "LaserCutter", "Knitter", "Chip", "Ink", "Electron", "Proton", "Artist", "Arduino", "Hacker", "Button", "Sensor", "PowerSupply", "Transistor", "Resistor", "Capacitor", "LED", "Coil", "Motor", "Actuator", "Ribbon", "Pin", "Scissors", "Filament", "Thimble", "Needle", "Hammer"];
 const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebellious", "Efficacious", "Fastidious", "Jocular", "Playful", "Nefarious", "Zealous", "Ambiguous", "Auspicious", "Berserk", "Bustling", "Calculating", "Colossal", "Decisive", "Dynamic", "Elastic", "Ethereal", "Exuberant", "Fabulous", "Fearless", "Grandiose", "Harmonious", "Hypnotic", "Incandescent", "Invincible", "Nebulous", "Nimble", "Omniscient", "Quirky", "Stupendous", "Thundering", "Whimsical", "Malevolent", "Spooky", "Majestic", "Epic", "Humble"];
@@ -19,7 +21,8 @@ var connection = mysql.createConnection({
     user: process.env.AWS_DB_USER,
     password: process.env.AWS_DB_PASS,
     database: process.env.AWS_DB_NAME,
-    ssl: "Amazon RDS"
+    ssl: "Amazon RDS",
+    charset: 'utf8mb4'
 });
 
 
@@ -34,11 +37,15 @@ var s3 = new aws.S3({ params: { Bucket: process.env.S3_BUCKET_NAME } });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -70,6 +77,22 @@ let generateNames = function (count) {
             names.push(name);
     }
     return names;
+}
+
+let getRequestIp = function (req) {
+    var ip;
+    if (req.headers['x-forwarded-for']) {
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    } else if (req.connection && req.connection.remoteAddress) {
+        ip = req.connection.remoteAddress;
+    } else {
+        ip = req.ip;
+    }
+    ip = (ip.length < 15 ? ip : (ip.substr(0, 7) === '::ffff:' ? ip.substr(7) : undefined));
+
+
+    console.log('ip address', ip);
+    return ip;
 }
 
 app.post('/upload', upload.single('photo'), function (req, res, next) {
@@ -108,13 +131,13 @@ app.get('/generateName/', function (req, res, next) {
     res.json({ name });
 });
 
-app.get('/posts/:postId', function (req, res, next) {
+app.get('/posts/:postName', function (req, res, next) {
     try {
-        connection.query('SELECT * FROM posts WHERE name = ?', req.params.postId, function (error, results, fields) {
+        connection.query('SELECT * FROM posts WHERE name = ?', req.params.postName, function (error, results, fields) {
             try {
                 if (error) throw error;
                 if (results.length == 0) throw new Error();
-                res.render('post', { name: results[0].name, image: results[0].imageLocation });
+                res.render('post', { name: results[0].name, image: results[0].imageLocation, postId: results[0].post_id });
             } catch (err) {
                 next(createError(404));
             }
@@ -124,6 +147,42 @@ app.get('/posts/:postId', function (req, res, next) {
     }
 
 });
+
+app.post('/comments/:postId', function (req, res, next) {
+    try {
+        if (!req.body.text || !req.params.postId) throw new Error('Missing params');
+        let ip = getRequestIp(req);
+        var geo = geoip.lookup(ip);
+        console.log(ip);
+        connection.query('INSERT INTO comments SET ?', { post_id: req.params.postId, comment_text: req.body.text , country: geo || 'Unknown' }, function (error, results, fields) {
+            try {
+                if (error) throw error;
+                connection.query('SELECT * FROM comments WHERE post_id = ? ORDER BY comment_time DESC', req.params.postId, function (error, results, fields) {
+                    if (error) { res.json({ success: false, error: err }); return; }
+                    res.json({ success: true, comments: results });
+                })
+            } catch (err) {
+                res.json({ success: false, error: err });
+            }
+        })
+    } catch (err) {
+        res.json({ success: false, error: err });
+    }
+})
+
+
+app.get('/comments/:postId', function (req, res, next) {
+    try {
+        if (!req.params.postId) throw new Error('Missing params');
+        connection.query('SELECT * FROM comments WHERE post_id = ? ORDER BY comment_time DESC', req.params.postId, function (error, results, fields) {
+            if (error) { res.json({ success: false, error: err }); return; }
+            res.json({ success: true, comments: results });
+        })
+
+    } catch (err) {
+        res.json({ success: false, error: err });
+    }
+})
 
 
 // catch 404 and forward to error handler

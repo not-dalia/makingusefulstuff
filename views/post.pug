@@ -1,0 +1,82 @@
+extends layout
+
+block content
+  h1= name
+  img(src=image, class="post-img")
+  p 
+    | Submitted at 
+    a(href='http://google.com',  target="_blank") Maker Faire UK
+
+  h2 Comments
+  div(id="submit-comment")
+    textarea(name="comment-input",id="comment-input",cols="50",rows="5", oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'")
+    button(id="comment-button") Submit
+
+  div(id="comments")
+  
+  script.
+    function htmlEncode(value){
+      // Create a in-memory div, set its inner text (which jQuery automatically encodes)
+      // Then grab the encoded contents back out. The div never exists on the page.
+      return $('<div/>').text(value).html();
+    }
+
+
+    var jqxhr = $.ajax("/comments/#{postId}")
+      .done(function(data) {
+        console.log( "success" );
+        console.log( data );
+        if (data.success == true){
+          $('#comments').empty();
+          for (let i = 0; i < data.comments.length; i++){
+            $('#comments').append(
+              '<div class="comment"><div class="comment-text">'
+              + htmlEncode(data.comments[i].comment_text)
+              + '</div><div class="comment-metadata">'
+              + 'From ' + data.comments[i].country
+              + ' at ' + data.comments[i].comment_time
+              + '</div>'
+              + '</div>'
+            );
+          }
+        }
+      })
+      .fail(function() {
+        console.log( "error" );
+      })
+      .always(function() {
+        console.log( "complete" );
+      });
+
+    $('button#comment-button').click(function() {
+      var jqxhr = $.ajax({
+        url: "/comments/#{postId}",
+        method: 'POST',
+        data: JSON.stringify({text: $('textarea#comment-input').val()}),
+        contentType: 'application/json; charset=utf-8'
+        })
+      .done(function(data) {
+        console.log( "success" );
+        console.log( data );
+        if (data.success == true){
+          $('#comments').empty();
+          for (let i = 0; i < data.comments.length; i++){
+            $('#comments').append(
+              '<div class="comment"><div class="comment-text">'
+              + htmlEncode(data.comments[i].comment_text)
+              + '</div><div class="comment-metadata">'
+              + 'From ' + data.comments[i].country
+              + ' at ' + data.comments[i].comment_time
+              + '</div>'
+              + '</div>'
+            );
+          }
+        }
+      })
+      .fail(function() {
+        console.log( "error" );
+      })
+      .always(function() {
+        console.log( "complete" );
+      });
+    });
