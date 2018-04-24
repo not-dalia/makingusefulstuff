@@ -15,7 +15,6 @@ const NOUNS = ["3DPrinter", "Maker", "Inventor", "Creator", "Scientist", "Engine
 const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebellious", "Efficacious", "Fastidious", "Jocular", "Playful", "Nefarious", "Zealous", "Ambiguous", "Auspicious", "Berserk", "Bustling", "Calculating", "Colossal", "Decisive", "Dynamic", "Elastic", "Ethereal", "Exuberant", "Fabulous", "Fearless", "Grandiose", "Harmonious", "Hypnotic", "Incandescent", "Invincible", "Nebulous", "Nimble", "Omniscient", "Quirky", "Stupendous", "Thundering", "Whimsical", "Malevolent", "Spooky", "Majestic", "Epic", "Humble"];
 
 
-
 var connection = mysql.createConnection({
     host: process.env.AWS_DB_HOST,
     user: process.env.AWS_DB_USER,
@@ -154,7 +153,7 @@ app.post('/comments/:postId', function (req, res, next) {
         let ip = getRequestIp(req);
         var geo = geoip.lookup(ip);
         console.log(ip);
-        connection.query('INSERT INTO comments SET ?', { post_id: req.params.postId, comment_text: req.body.text , country: geo || 'Unknown' }, function (error, results, fields) {
+        connection.query('INSERT INTO comments SET ?', { post_id: req.params.postId, comment_text: req.body.text , country: (geo && geo.country) || 'Unknown' }, function (error, results, fields) {
             try {
                 if (error) throw error;
                 connection.query('SELECT * FROM comments WHERE post_id = ? ORDER BY comment_time DESC', req.params.postId, function (error, results, fields) {
