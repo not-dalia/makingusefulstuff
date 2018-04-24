@@ -10,9 +10,11 @@ var mysql = require('mysql');
 const fs = require('fs');
 var geoip = require('geoip-country');
 const bodyParser = require('body-parser');
+var Twit = require('twit')
 
 const NOUNS = ["3DPrinter", "Maker", "Inventor", "Creator", "Scientist", "Engineer", "Designer", "Programmer", "Robot", "LaserCutter", "Knitter", "Chip", "Ink", "Electron", "Proton", "Artist", "Arduino", "Hacker", "Button", "Sensor", "PowerSupply", "Transistor", "Resistor", "Capacitor", "LED", "Coil", "Motor", "Actuator", "Ribbon", "Pin", "Scissors", "Filament", "Thimble", "Needle", "Hammer"];
 const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebellious", "Efficacious", "Fastidious", "Jocular", "Playful", "Nefarious", "Zealous", "Ambiguous", "Auspicious", "Berserk", "Bustling", "Calculating", "Colossal", "Decisive", "Dynamic", "Elastic", "Ethereal", "Exuberant", "Fabulous", "Fearless", "Grandiose", "Harmonious", "Hypnotic", "Incandescent", "Invincible", "Nebulous", "Nimble", "Omniscient", "Quirky", "Stupendous", "Thundering", "Whimsical", "Malevolent", "Spooky", "Majestic", "Epic", "Humble"];
+
 
 
 var connection = mysql.createConnection({
@@ -23,6 +25,15 @@ var connection = mysql.createConnection({
     ssl: "Amazon RDS",
     charset: 'utf8mb4'
 });
+
+var T = new Twit({
+    consumer_key: process.env.TW_CONSUMER_KEY,
+    consumer_secret: process.env.TW_CONSUMER_SECRET,
+    access_token: process.env.TW_ACCESS_TOKEN,
+    access_token_secret: process.env.TW_ACCESS_TOKEN_SECRET,
+    timeout_ms: 60 * 1000,  // optional HTTP request timeout to apply to all requests. 
+})
+
 
 
 var indexRouter = require('./routes/index');
@@ -117,7 +128,13 @@ app.post('/upload', upload.single('photo'), function (req, res, next) {
 
             connection.query('INSERT INTO posts SET ?', { name: names[0], imageLocation: req.file.location }, function (error, results, fields) {
                 if (error) res.json({ success: false, error: error });
-                else res.json({ success: true, image: req.file.location, name: names[0], path: 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] });
+                else {
+                    T.post('statuses/update', { status: 'Check out ' + names[0] + '\'s new button! #makeusefulstuff #makerfaireUK \n' + 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] }, function(err, data, response) {
+                        console.log(data)
+                      })
+
+                    res.json({ success: true, image: req.file.location, name: names[0], path: 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] });
+                }
             });
         })
     } catch (err) {
@@ -153,7 +170,7 @@ app.post('/comments/:postId', function (req, res, next) {
         let ip = getRequestIp(req);
         var geo = geoip.lookup(ip);
         console.log(ip);
-        connection.query('INSERT INTO comments SET ?', { post_id: req.params.postId, comment_text: req.body.text , country: (geo && geo.country) || 'Unknown' }, function (error, results, fields) {
+        connection.query('INSERT INTO comments SET ?', { post_id: req.params.postId, comment_text: req.body.text, country: (geo && geo.country) || 'Unknown' }, function (error, results, fields) {
             try {
                 if (error) throw error;
                 connection.query('SELECT * FROM comments WHERE post_id = ? ORDER BY comment_time DESC', req.params.postId, function (error, results, fields) {
