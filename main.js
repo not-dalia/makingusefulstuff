@@ -19,7 +19,9 @@ var connection = mysql.createConnection({
     user: process.env.AWS_DB_USER,
     password: process.env.AWS_DB_PASS,
     database: process.env.AWS_DB_NAME,
-    ssl: "Amazon RDS"
+    ssl: {
+        ca: fs.readFileSync(__dirname + '/config/mysql-ca.crt')
+    }
 });
 
 
