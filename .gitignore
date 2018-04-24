@@ -1,6 +1,7 @@
 node_modules/
 .elasticbeanstalk/
 .env
+config.json
 
 # Elastic Beanstalk Files
 
