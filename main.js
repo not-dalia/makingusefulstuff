@@ -152,7 +152,7 @@ app.post('/upload', upload.single('photo'), function (req, res, next) {
                         console.log(data)
                     })
 
-                    res.json({ success: true, image: req.file.location, name: names[0], path: 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] });
+                    res.json({ success: true, image: req.file.location, name: names[0], path: 'http://www.makeusefulstuff.eu/posts/' + names[0] });
                 }
             });
         })
