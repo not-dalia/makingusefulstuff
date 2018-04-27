@@ -17,6 +17,7 @@ const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebelliou
 
 
 
+
 var connection = mysql.createConnection({
     host: process.env.AWS_DB_HOST,
     user: process.env.AWS_DB_USER,
@@ -123,6 +124,28 @@ app.get('/', function (req, res, next) {
     }
 });
 
+app.get('/:postName', function (req, res, next) {
+    try {
+        connection.query('SELECT * FROM posts_with_comments WHERE name = ?', req.params.postName, function (error, results, fields) {
+            try {
+                if (error) throw error;
+                if (results.length == 0) throw new Error();
+                let spacedName = results[0].name;
+                var nth = 0;
+                spacedName = spacedName.replace(/([A-Z])/g, function (match, i, original) {
+                    nth++;
+                    return (nth === 2) ? ' ' + match : match;
+                }).trim() ;
+                res.render('post', { name: results[0].name, image: results[0].imageLocation, postId: results[0].post_id, content: results[0].content, commentCount: results[0].comment_count, title: 'Make Useful Stuff - ' + spacedName, spacedName: spacedName, date: results[0].creationDate});
+            } catch (err) {
+                next(createError(404));
+            }
+        })
+    } catch (err) {
+        next(createError(404));
+    }
+
+});
 
 app.post('/upload', upload.single('photo'), function (req, res, next) {
     try {
@@ -165,6 +188,14 @@ app.get('/generateName/', function (req, res, next) {
     let name = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] + NOUNS[Math.floor(Math.random() * NOUNS.length)];
     res.json({ name });
 });
+
+app.get('//:postname', function (req, res, next) {
+    res.redirect('/' + req.params.postname);
+})
+
+app.get('//posts/:postname', function (req, res, next) {
+    res.redirect('/posts/' + req.params.postname);
+})
 
 app.get('/posts/:postName', function (req, res, next) {
     try {
