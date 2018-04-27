@@ -7,23 +7,32 @@ block meta
   meta(name="twitter:image", content=image)
 
 block content
-  h1= name
-  img(src=image, class="post-img")
-  p 
-    | Submitted at 
-    a(href='http://google.com',  target="_blank") Maker Faire UK
+  a.back-button.comment-text(href='/') ← Back to all posts
 
-  h2 Comments
-  div(id="submit-comment")
-    textarea(name="comment-input",id="comment-input",cols="50",rows="5", oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'")
-    button(id="comment-button") Submit
+  .row
+    .col.s12.post
+      h2.mus-blue-text= spacedName
+      div(style='margin: 0 0 10px 0;')
+        span.comment-text.blue-grey-text.text-lighten-2(style="text-transform: uppercase; ") #{moment(date).format('MMMM Do YYYY, h:mm a')}
+      .post-img-container
+        img.post-img(src=image)
+      p !{content}
 
-  div(id="comments")
-  
+    .col.s12.post
+      .hr
+    
+    .col.s12.post
+      h3.mus-red-text #{commentCount} Comments
+      div(id="submit-comment")
+        textarea(name="comment-input",id="comment-input",cols="50",rows="5",placeholder="Enter your comment here...")
+        button.mus-blue.btn.waves-effect.waves-light(type='submit' name='action' id="comment-button")
+          i.fas.fa-paper-plane(style='font-size: 1em; margin-right: 10px')
+          | send comment
+
+      div(id="comments")
+      
   script.
     function htmlEncode(value){
-      // Create a in-memory div, set its inner text (which jQuery automatically encodes)
-      // Then grab the encoded contents back out. The div never exists on the page.
       return $('<div/>').text(value).html();
     }
 
@@ -35,13 +44,17 @@ block content
         if (data.success == true){
           $('#comments').empty();
           for (let i = 0; i < data.comments.length; i++){
+            let countryFlag = 'https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/';
+            if (data.comments[i].country.toLowerCase() == 'unknown'){
+              countryFlag = '/images/Missing_flag.png';
+            }
             $('#comments').append(
-              '<div class="comment"><div class="comment-text">'
+              '<div class="comment"><div class="comment-text comment-content">'
               + htmlEncode(data.comments[i].comment_text)
-              + '</div><div class="comment-metadata">'
-              + 'From ' + data.comments[i].country
-              + ' at ' + data.comments[i].comment_time
-              + '</div>'
+              + '</div><div class="comment-metadata comment-text blue-grey-text text-lighten-1">'
+              + '<img style="width: 20px; height: 15px;" src="' + countryFlag + '" alt="' + data.comments[i].country + '"/>'
+              + '<p>at ' + moment(data.comments[i].comment_time).format('MMMM Do YYYY, h:mm a')
+              + '</p></div>'
               + '</div>'
             );
           }
@@ -68,13 +81,17 @@ block content
           $('textarea#comment-input').val('')
           $('#comments').empty();
           for (let i = 0; i < data.comments.length; i++){
+            let countryFlag = 'https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/';
+            if (data.comments[i].country.toLowerCase() == 'unknown'){
+              countryFlag = '/images/Missing_flag.png';
+            }
             $('#comments').append(
-              '<div class="comment"><div class="comment-text">'
+              '<div class="comment"><div class="comment-text comment-content">'
               + htmlEncode(data.comments[i].comment_text)
-              + '</div><div class="comment-metadata">'
-              + 'From ' + data.comments[i].country
-              + ' at ' + data.comments[i].comment_time
-              + '</div>'
+              + '</div><div class="comment-metadata comment-text blue-grey-text text-lighten-1">'
+              + '<img style="width: 20px; height: 15px;" src="' + countryFlag + '" alt="' + data.comments[i].country + '"/>'
+              + '<p> at ' + moment(data.comments[i].comment_time).format('MMMM Do YYYY, h:mm a')
+              + '</p></div>'
               + '</div>'
             );
           }

@@ -1,37 +1,289 @@
+/***************************************/
+
+/*************** FONTS *****************/
+
+/***************************************/
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@font-face {
+    font-family: 'Bebas Kai';
+    src: url('/fonts/bebaskai-regular-webfont.woff2') format('woff2'), url('/fonts/bebaskai-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Folktale';
+    src: url('/fonts/folktale-webfont.woff2') format('woff2'), url('/fonts/folktale-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Bebas Neue';
+    src: url('/fonts/bebasneue-webfont.woff2') format('woff2'), url('/fonts/bebasneue-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***************************************/
+
+/*************** COLORS ****************/
+
+/***************************************/
+
+.mus-red-text {
+    color: #db1d37;
+}
+
+.mus-red {
+    background: #db1d37;
+}
+
+.mus-blue-text {
+    color: #296ba7;
+}
+
+.mus-blue {
+    background: #296ba7;
+}
+
+/***************************************/
+
+/*************** LAYOUT ****************/
+
+/***************************************/
+
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    font: 12pt "Open Sans", Helvetica, Arial, sans-serif;
+    color: #444;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+    padding-top: 20px;
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
+}
+
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-small):not(.btn-large):not(.btn-floating) {
+    color: #db1d37;
+}
+
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-small):not(.btn-large):not(.btn-floating):hover {
+    color: #00B7FF;
+}
+
+h1 {
+    font-family: "Folktale";
+    font-size: 36pt;
+    font-weight: normal;
+    margin: 12px 0;
+    text-transform: uppercase;
+}
+
+h2 {
+    font-family: "Bebas Kai";
+    font-size: 26pt;
+    font-weight: normal;
+    margin: 12px 0;
+}
+
+h3 {
+    font-family: "Bebas Neue";
+    font-size: 20pt;
+    font-weight: normal;
+    margin: 12px 0;
+}
+
+.comment-text {
+    font-size: 10pt;
+}
+
+.center {
+    text-align: center;
+}
+
+.right-text {
+    text-align: right;
+    width: 100%;
+}
+
+.hover-icons {
+    position: relative;
+    padding: 9px;
+    transition: transform 0.2s;
+}
+
+.hover-icons:hover {
+    transform: scale(1.1);
+    cursor: default;
+}
+
+a.hover-underline:hover {
+    text-decoration: underline;
+}
+
+.post-img-container {
+    display: block;
 }
 
 .post-img {
-  display: block;
-  max-width:1280px;
-  max-height:960px;
-  width: auto;
-  height: auto;
-
+    max-width: 100%;
+    max-height: 960px;
+    width: auto;
+    height: auto;
+    border-radius: 3px;
 }
 
-#submit-comment{
-  display:inline-block;
-  position:relative;
+#submit-comment {
+    display: inline-block;
+    width: 100%;
+    padding: 20px 0;
 }
 
-#submit-comment button{
-  position:absolute;
-  bottom:10px;
-  right:10px;
+#submit-comment button {
+    float: right;
 }
 
-#submit-comment textarea{
-  display:block;
-  resize: none;
+#submit-comment textarea {
+    display: block;
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    border-radius: 3x;
+    margin-bottom: 10px;
+    padding: 10px;
 }
 
-.comment .comment-text{
-  white-space: pre-wrap;
+.comment .comment-text {
+    white-space: pre-wrap;
+}
+
+.header {
+    display: block;
+    width: 100%;
+}
+
+.header-container {
+    padding: 20px 5% 10px 5%;
+}
+
+.hr-container {
+    width: 100%;
+}
+
+.hr {
+    height: 5px;
+    width: 100%;
+    margin: 2px 0px;
+}
+
+.post .hr {
+    height: 1px;
+    background: #e4e4e4;
+    margin: 20px 0px;
+}
+
+/* .cards-container {
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.cards-container .card {
+    display: inline-block;
+    overflow: visible;
+} */
+
+.cards-container {
+    display: flex;
+    align-items: start;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    min-width: 310px;
+    margin-left: 10px;
+    margin-right: 10px;
+    flex: 1 0 30%;
+}
+
+.card .card-content {
+    padding: 14px 24px;
+}
+
+@media only screen and (max-width: 600px) {
+    .card {
+        min-width: 250px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+.back-button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid #e4e4e4;
+    transition: background-color 0.2s, color 0.2s;
+    display: inline-block;
+    color: #777;
+    margin: 10px;
+}
+
+.back-button:hover {
+    background-color: #e4e4e4;
+    color: #444;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.post a:hover {
+    text-decoration: underline;
+}
+
+.comment-metadata{
+  text-transform: uppercase;
+}
+
+.comment-metadata p, img{
+  display: inline-block;
+}
+
+.comment-metadata p{
+  margin: 10px 0 0 0;
+}
+.comment-metadata img{
+  margin: 0px 5px 0 5px;
+  vertical-align: middle;
+}
+
+#comment-button:hover, #comment-button:focus{
+  background: #2a94be;
+}
+
+.comment-content{
+  padding: 0 5px;
+  text-align: justify;
+  color: #296ba7;
+}
+
+.comment{
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px dashed #ccc;
 }

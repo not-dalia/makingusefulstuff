@@ -1,5 +1,8 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h2.mus-blue-text.center Check out all these useful stuff
+  .row(style='margin-top: 30px')
+    .col.s12.cards-container
+      each item in posts
+        include cardpost.pug

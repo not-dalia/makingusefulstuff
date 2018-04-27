@@ -15,6 +15,7 @@ var Twit = require('twit')
 const NOUNS = ["3DPrinter", "Maker", "Inventor", "Creator", "Scientist", "Engineer", "Designer", "Programmer", "Robot", "LaserCutter", "Knitter", "Chip", "Ink", "Electron", "Proton", "Artist", "Arduino", "Hacker", "Button", "Sensor", "PowerSupply", "Transistor", "Resistor", "Capacitor", "LED", "Coil", "Motor", "Actuator", "Ribbon", "Pin", "Scissors", "Filament", "Thimble", "Needle", "Hammer"];
 const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebellious", "Efficacious", "Fastidious", "Jocular", "Playful", "Nefarious", "Zealous", "Ambiguous", "Auspicious", "Berserk", "Bustling", "Calculating", "Colossal", "Decisive", "Dynamic", "Elastic", "Ethereal", "Exuberant", "Fabulous", "Fearless", "Grandiose", "Harmonious", "Hypnotic", "Incandescent", "Invincible", "Nebulous", "Nimble", "Omniscient", "Quirky", "Stupendous", "Thundering", "Whimsical", "Malevolent", "Spooky", "Majestic", "Epic", "Humble"];
 
+aws.config.loadFromPath('./config.json');
 
 
 var connection = mysql.createConnection({
@@ -49,6 +50,8 @@ var s3 = new aws.S3({ params: { Bucket: process.env.S3_BUCKET_NAME } });
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+app.locals.moment = require('moment');
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -60,7 +63,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/', indexRouter);
+//app.use('/', indexRouter);
 app.use('/uploads', uploadsRouter);
 
 
@@ -105,6 +108,23 @@ let getRequestIp = function (req) {
     return ip;
 }
 
+
+app.get('/', function (req, res, next) {
+    try {
+        connection.query('SELECT * FROM posts_with_comments ORDER BY creationDate DESC', function (error, results, fields) {
+            try {
+                if (error) throw error;
+                res.render('index', { title: 'Make Useful Things', posts: results });
+            } catch (err) {
+                next(createError(404));
+            }
+        })
+    } catch (err) {
+        next(createError(404));
+    }
+});
+
+
 app.post('/upload', upload.single('photo'), function (req, res, next) {
     try {
         if (!req.file || !req.file.location) throw new Error('There was a problem with the file upload')
@@ -129,9 +149,9 @@ app.post('/upload', upload.single('photo'), function (req, res, next) {
             connection.query('INSERT INTO posts SET ?', { name: names[0], imageLocation: req.file.location }, function (error, results, fields) {
                 if (error) res.json({ success: false, error: error });
                 else {
-                    T.post('statuses/update', { status: 'Check out ' + names[0] + '\'s new button! #makeusefulstuff #makerfaireUK \n' + 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] }, function(err, data, response) {
+                    T.post('statuses/update', { status: 'Check out ' + names[0] + '\'s new button! #makeusefulstuff #makerfaireUK \n' + 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] }, function (err, data, response) {
                         console.log(data)
-                      })
+                    })
 
                     res.json({ success: true, image: req.file.location, name: names[0], path: 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] });
                 }
@@ -149,11 +169,17 @@ app.get('/generateName/', function (req, res, next) {
 
 app.get('/posts/:postName', function (req, res, next) {
     try {
-        connection.query('SELECT * FROM posts WHERE name = ?', req.params.postName, function (error, results, fields) {
+        connection.query('SELECT * FROM posts_with_comments WHERE name = ?', req.params.postName, function (error, results, fields) {
             try {
                 if (error) throw error;
                 if (results.length == 0) throw new Error();
-                res.render('post', { name: results[0].name, image: results[0].imageLocation, postId: results[0].post_id });
+                let spacedName = results[0].name;
+                var nth = 0;
+                spacedName = spacedName.replace(/([A-Z])/g, function (match, i, original) {
+                    nth++;
+                    return (nth === 2) ? ' ' + match : match;
+                }).trim() ;
+                res.render('post', { name: results[0].name, image: results[0].imageLocation, postId: results[0].post_id, content: results[0].content, commentCount: results[0].comment_count, title: 'Make Useful Stuff - ' + spacedName, spacedName: spacedName, date: results[0].creationDate});
             } catch (err) {
                 next(createError(404));
             }
