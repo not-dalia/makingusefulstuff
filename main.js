@@ -191,11 +191,11 @@ app.get('/posts/:postName', function (req, res, next) {
 
 app.post('/comments/:postId', function (req, res, next) {
     try {
-        if (!req.body.text || !req.params.postId) throw new Error('Missing params');
+        if (!req.body.text || !req.body.text.replace(/\s+$/g, '') == '' || !req.params.postId) throw new Error('Missing params');
         let ip = getRequestIp(req);
         var geo = geoip.lookup(ip);
         console.log(ip);
-        connection.query('INSERT INTO comments SET ?', { post_id: req.params.postId, comment_text: req.body.text, country: (geo && geo.country) || 'Unknown' }, function (error, results, fields) {
+        connection.query('INSERT INTO comments SET ?', { post_id: req.params.postId, comment_text: req.body.text.replace(/\s+$/g, ''), country: (geo && geo.country) || 'Unknown' }, function (error, results, fields) {
             try {
                 if (error) throw error;
                 connection.query('SELECT * FROM comments WHERE post_id = ? ORDER BY comment_time DESC', req.params.postId, function (error, results, fields) {
