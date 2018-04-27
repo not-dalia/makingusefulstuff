@@ -47,13 +47,15 @@ block content
             let countryFlag = 'https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/';
             if (data.comments[i].country.toLowerCase() == 'unknown'){
               countryFlag = '/images/Missing_flag.png';
+            } else {
+              countryFlag+= data.comments[i].country.toUpperCase()  + '.png'
             }
             $('#comments').append(
               '<div class="comment"><div class="comment-text comment-content">'
               + htmlEncode(data.comments[i].comment_text)
               + '</div><div class="comment-metadata comment-text blue-grey-text text-lighten-1">'
-              + '<img style="width: 20px; height: 15px;" src="' + countryFlag + data.comments[i].country.toUpperCase()  + '.png'+ '" alt="' + data.comments[i].country + '"/>'
-              + '<p>at ' + moment(data.comments[i].comment_time).format('MMMM Do YYYY, h:mm a')
+              + '<img style="width: 20px; height: 15px;" src="' + countryFlag + '" alt="' + data.comments[i].country + '"/>'
+              + '<p> at ' + moment(data.comments[i].comment_time).format('MMMM Do YYYY, h:mm a')
               + '</p></div>'
               + '</div>'
             );
@@ -84,12 +86,14 @@ block content
             let countryFlag = 'https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/';
             if (data.comments[i].country.toLowerCase() == 'unknown'){
               countryFlag = '/images/Missing_flag.png';
+            } else {
+              countryFlag+= data.comments[i].country.toUpperCase()  + '.png'
             }
             $('#comments').append(
               '<div class="comment"><div class="comment-text comment-content">'
               + htmlEncode(data.comments[i].comment_text)
               + '</div><div class="comment-metadata comment-text blue-grey-text text-lighten-1">'
-              + '<img style="width: 20px; height: 15px;" src="' + countryFlag + data.comments[i].country.toUpperCase()  + '.png'+ '" alt="' + data.comments[i].country + '"/>'
+              + '<img style="width: 20px; height: 15px;" src="' + countryFlag + '" alt="' + data.comments[i].country + '"/>'
               + '<p> at ' + moment(data.comments[i].comment_time).format('MMMM Do YYYY, h:mm a')
               + '</p></div>'
               + '</div>'
