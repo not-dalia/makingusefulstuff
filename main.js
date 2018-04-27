@@ -148,7 +148,7 @@ app.post('/upload', upload.single('photo'), function (req, res, next) {
             connection.query('INSERT INTO posts SET ?', { name: names[0], imageLocation: req.file.location }, function (error, results, fields) {
                 if (error) res.json({ success: false, error: error });
                 else {
-                    T.post('statuses/update', { status: 'Check out ' + names[0] + '\'s new button! #makeusefulstuff #makerfaireUK \n' + 'https://makeusefulstuff.herokuapp.com/posts/' + names[0] }, function (err, data, response) {
+                    T.post('statuses/update', { status: 'Check out ' + names[0] + '\'s new button! #makeusefulstuff #makerfaireUK \n' + 'http://www.makeusefulstuff.eu/posts/' + names[0] }, function (err, data, response) {
                         console.log(data)
                     })
 
