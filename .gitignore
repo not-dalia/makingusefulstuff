@@ -3,6 +3,7 @@ node_modules/
 .env
 config.json
 logs.txt
+logs2.txt
 
 # Elastic Beanstalk Files
 

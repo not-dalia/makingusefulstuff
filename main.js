@@ -16,9 +16,6 @@ const NOUNS = ["3DPrinter", "Maker", "Inventor", "Creator", "Scientist", "Engine
 const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebellious", "Efficacious", "Fastidious", "Jocular", "Playful", "Nefarious", "Zealous", "Ambiguous", "Auspicious", "Berserk", "Bustling", "Calculating", "Colossal", "Decisive", "Dynamic", "Elastic", "Ethereal", "Exuberant", "Fabulous", "Fearless", "Grandiose", "Harmonious", "Hypnotic", "Incandescent", "Invincible", "Nebulous", "Nimble", "Omniscient", "Quirky", "Stupendous", "Thundering", "Whimsical", "Malevolent", "Spooky", "Majestic", "Epic", "Humble"];
 
 
-aws.config.loadFromPath('./config.json');
-
-
 
 var connection = mysql.createConnection({
     host: process.env.AWS_DB_HOST,
