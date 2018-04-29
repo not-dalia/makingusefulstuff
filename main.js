@@ -17,7 +17,6 @@ const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebelliou
 
 
 
-
 var connection = mysql.createConnection({
     host: process.env.AWS_DB_HOST,
     user: process.env.AWS_DB_USER,
