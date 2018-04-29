@@ -16,6 +16,9 @@ const NOUNS = ["3DPrinter", "Maker", "Inventor", "Creator", "Scientist", "Engine
 const ADJECTIVES = ["Antimatter", "Crafty", "Terrific", "Ubiquitous", "Rebellious", "Efficacious", "Fastidious", "Jocular", "Playful", "Nefarious", "Zealous", "Ambiguous", "Auspicious", "Berserk", "Bustling", "Calculating", "Colossal", "Decisive", "Dynamic", "Elastic", "Ethereal", "Exuberant", "Fabulous", "Fearless", "Grandiose", "Harmonious", "Hypnotic", "Incandescent", "Invincible", "Nebulous", "Nimble", "Omniscient", "Quirky", "Stupendous", "Thundering", "Whimsical", "Malevolent", "Spooky", "Majestic", "Epic", "Humble"];
 
 
+aws.config.loadFromPath('./config.json');
+
+
 
 var connection = mysql.createConnection({
     host: process.env.AWS_DB_HOST,
@@ -221,7 +224,7 @@ app.get('/posts/:postName', function (req, res, next) {
 
 app.post('/comments/:postId', function (req, res, next) {
     try {
-        if (!req.body.text || !req.body.text.replace(/\s+$/g, '') == '' || !req.params.postId) throw new Error('Missing params');
+        if (!req.body.text || req.body.text.replace(/\s+$/g, '') == '' || !req.params.postId) throw new Error('Missing params');
         let ip = getRequestIp(req);
         var geo = geoip.lookup(ip);
         console.log(ip);
