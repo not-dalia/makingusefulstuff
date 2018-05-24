@@ -13,6 +13,9 @@ html
     script.
       window.addEventListener("load", function(){
       window.cookieconsent.initialise({
+      "cookie": {
+        "name": "gdpr_cookieconsent_status"
+      },
       "palette": {
       "popup": {
       "background": "#296ba7"
@@ -23,6 +26,7 @@ html
       },
       "theme": "classic",
       "type": "opt-in",
+      "revokable": true,
       "content": {
         "message": "This website uses a cookie for Google Analytics to aid our understanding of how people use the site.",
         "dismiss": "Decline"
@@ -33,13 +37,26 @@ html
         var didConsent = status == 'allow'? true : false;
         if (type == 'opt-in' && didConsent) {
           // enable cookies
-          console.log('enable cookies')
+          console.log('enable cookies');
+          window['ga-disable-UA-118338983-1'] = false;
           gtag('config', 'UA-118338983-1', { 'anonymize_ip': true });
         }
         if (type == 'opt-out' && !didConsent) {
           // disable cookies
           console.log('disable cookies')
-          
+        }
+        if (this.options.revokable) {
+          if (document.getElementsByClassName('cc-revoke').length > 0) 
+            document.getElementsByClassName('cc-revoke')[0].style.display = 'block'
+          else {
+            document.body.innerHTML += '<div class="cc-revoke cc-bottom cc-color-override-452207525" >Cookie Policy</div>';
+            document.getElementsByClassName("cc-revoke")[0].addEventListener("click", () => {
+              for (let i = 0; i < document.getElementsByClassName("cc-revoke").length; i++) {
+                document.getElementsByClassName("cc-revoke")[i].style.display = 'none';
+              }
+              this.revokeChoice();
+            });
+          }
         }
       },
       
@@ -50,12 +67,17 @@ html
         if (type == 'opt-in' && didConsent) {
           // enable cookies
           console.log('enable cookies')
+          window['ga-disable-UA-118338983-1'] = false;
           gtag('config', 'UA-118338983-1', { 'anonymize_ip': true });
         }
         if (type == 'opt-out' && !didConsent) {
           // disable cookies
           console.log('disable cookies')
-          
+        }
+        if (this.options.revokable) {
+          if (document.getElementsByClassName('cc-revoke').length > 0) 
+            document.getElementsByClassName('cc-revoke')[0].style.display = 'block'
+
         }
       },
       
@@ -63,8 +85,11 @@ html
         var type = this.options.type;
         if (type == 'opt-in') {
           // disable cookies
+          document.cookie = '_gat_gtag_UA_118338983_1' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          document.cookie = '_gid' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          document.cookie = '_ga' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          window['ga-disable-UA-118338983-1'] = true;
           console.log('disable cookies')
-          
         }
         if (type == 'opt-out') {
           // enable cookies
